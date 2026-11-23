@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>NEXTUP - Your Next Step Starts Here</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#182235}
+header{background:#101827;color:white;padding:25px 20px}
+.wrap{max-width:760px;margin:auto}
+.logo{font-size:30px;font-weight:900;letter-spacing:2px}
+.tagline{color:#c5d0e0;margin-top:5px}
+main{padding:25px 16px}
+.card{background:white;border-radius:16px;padding:22px;margin:0 auto 18px;max-width:760px;box-shadow:0 5px 22px #17243a0c}
+h1{font-size:27px;margin:0 0 10px}
+h2{font-size:20px;margin-top:0}
+p{line-height:1.5;color:#526075}
+label{display:block;font-weight:bold;margin:16px 0 8px}
+textarea,select{width:100%;padding:14px;border:1px solid #cbd4e1;border-radius:10px;font:16px Arial;background:white}
+textarea{min-height:115px;resize:vertical}
+button{border:0;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{background:#2463eb;color:white;width:100%;margin-top:15px}
+.secondary{background:#e8eef8;color:#1c3765}
+.result{display:none}
+.step{padding:13px;background:#f1f5fb;border-radius:10px;margin:10px 0;line-height:1.45}
+.step input{margin-right:9px;transform:scale(1.2)}
+.small{font-size:13px;color:#758196}
+footer{text-align:center;padding:20px;color:#7b8798;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+  <div class="logo">NEXTUP</div>
+  <div class="tagline">Less confusion. More solutions.</div>
+ </div>
+</header>
+<main>
+ <section class="card">
+  <h1>What's going on?</h1>
+  <p>Tell NEXTUP what's happening. We'll help you organize the problem and figure out a sensible next step.</p>
+  <label for="category">What kind of situation is it?</label>
+  <select id="category">
+   <option value="general">Something else</option>
+   <option value="bill">A bill or unexpected charge</option>
+   <option value="purchase">A purchase or damaged delivery</option>
+   <option value="home">A landlord or home issue</option>
+   <option value="vehicle">A vehicle or mechanic issue</option>
+   <option value="letter">A confusing letter or document</option>
+  </select>
+  <label for="problem">Describe what's happening</label>
+  <textarea id="problem" placeholder="Example: I received a bill that is much higher than I expected..."></textarea>
+  <button class="primary" onclick="makePlan()">HELP ME FIGURE OUT WHAT'S NEXT</button>
+  <p class="small">Prototype version: your description stays in this browser. Don't enter passwords, account numbers, or sensitive personal information.</p>
+ </section>
+
+ <section class="card result" id="result">
+  <h2>Your NEXTUP action plan</h2>
+  <p id="summary"></p>
+  <h2>Start with these steps</h2>
+  <div id="steps"></div>
+  <label for="notes">Notes or updates</label>
+  <textarea id="notes" placeholder="Record who you contacted, what they said, or what happens next..."></textarea>
+  <button class="secondary" onclick="saveNotes()">SAVE MY NOTES</button>
+  <p id="saved" class="small"></p>
+  <p class="small">This is general organizational help, not legal, financial, or professional advice. Check important deadlines and verify information with the relevant organization.</p>
+ </section>
+</main>
+<footer>NEXTUP · Your next step starts here.</footer>
+<script>
+function makePlan(){
+ const problem=document.getElementById('problem').value.trim();
+ if(!problem){alert('Please describe what is happening first.');return;}
+ const category=document.getElementById('category').value;
+ const plans={
+  general:['Write down exactly what happened.','Gather any messages, receipts, or documents related to it.','Identify who can help resolve the situation.','Contact them and keep a record of the response.'],
+  bill:['Compare the bill with your previous bill or agreement.','Look for unfamiliar charges, fees, or dates.','Contact the company using its official contact information.','Ask for an explanation and keep a record of the conversation.'],
+  purchase:['Take photos of the item and its packaging.','Find your receipt, order confirmation, and delivery details.','Check the seller’s return or damage policy.','Contact the seller and clearly explain the issue.'],
+  home:['Write down what happened and when.','Take photos or keep copies of relevant messages.','Review your lease or written agreement if applicable.','Communicate in writing and keep a copy of everything.'],
+  vehicle:['Ask for an itemized estimate or invoice.','Request an explanation of each recommended repair.','Keep records of conversations and approvals.','Consider a second opinion before approving expensive work.'],
+  letter:['Identify who sent the letter and what it requests.','Look for dates, deadlines, and required responses.','Keep the original letter and any envelope.','Contact the sender through independently verified contact information if anything is unclear.']
+ };
+ document.getElementById('summary').textContent='You described: "'+problem+'" Here is a starting checklist. Review each step and adapt it to your situation.';
+ document.getElementById('steps').innerHTML=plans[category].map((s,i)=>'<div class="step"><label><input type="checkbox" onchange="updateProgress()"> '+s+'</label></div>').join('');
+ document.getElementById('result').style.display='block';
+ document.getElementById('saved').textContent='';
+ document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+function updateProgress(){
+ const boxes=[...document.querySelectorAll('#steps input')];
+ const done=boxes.filter(b=>b.checked).length;
+ document.getElementById('saved').textContent=done+' of '+boxes.length+' steps completed.';
+}
+function saveNotes(){
+ try{
+  localStorage.setItem('nextup-notes',document.getElementById('notes').value);
+  document.getElementById('saved').textContent='Notes saved in this browser.';
+ }catch(e){
+  document.getElementById('saved').textContent='Could not save notes in this browser.';
+ }
+}
+try{
+ document.getElementById('notes').value=localStorage.getItem('nextup-notes')||'';
+}catch(e){}
+</script>
+</body>
+</html>
